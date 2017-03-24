@@ -136,14 +136,14 @@ For Kubernetes, there's a few config files in /etc/kubernetes we need to set up 
         controller-manager
         scheduler
 
-**Note:** If you've been following this documentation starting from CentOs, it is important want you to know, that current versions of CentOS Atomic have the kubernetes-master pkg removed from the image, to be run from containers. There's info on that here: [instructions on the CentOS wiki](https://wiki.centos.org/SpecialInterestGroup/Atomic/ContainerizedMaster).
+**Note:** If you've been following this documentation starting from CentOs, it is important for you to know, that current versions of CentOS Atomic have the kubernetes-master pkg removed from the image, to be run from containers. There's info on that here: [instructions on the CentOS wiki](https://wiki.centos.org/SpecialInterestGroup/Atomic/ContainerizedMaster).
 
 #### Common service configurations
 We'll be setting up the etcd store that Kubernetes will use.  We're using a single local etcd service, so we'll point that at the master on the standard port.  We'll also set up how the services find the apiserver.
 
     [fedora@atomic-master ~]$ sudo vi /etc/kubernetes/config
     # Comma separated list of nodes in the etcd cluster
-    KUBE_ETCD_SERVERS="--etcd_servers=http://192.168.122.10:2379"
+    KUBE_ETCD_SERVERS="--etcd-servers=http://192.168.122.10:2379"
 
     # How the controller-manager, scheduler, and proxy find the kube-apiserver
     KUBE_MASTER="--master=http://192.168.122.10:443"
@@ -153,12 +153,12 @@ The apiserver needs to be set to listen on all IP addresses, instead of just loc
 
     [fedora@atomic-master ~]$ sudo vi /etc/kubernetes/apiserver
     # The address on the local server to listen to.
-    KUBE_API_ADDRESS="--address=0.0.0.0"
+    KUBE_API_ADDRESS="--insecure-bind-address=0.0.0.0"
 
 If you need to modify the set of IPs that Kubernetes assigns to services, change the KUBE_SERVICE_ADDRESSES value. Since this guide is using the 192.168.122.0/24 and 172.16.0.0/12 networks, we can leave the default.  This address space needs to be unused elsewhere, but doesn't need to be reachable from either of the other networks.
 
     # Address range to use for services
-    KUBE_SERVICE_ADDRESSES="--portal_net=10.254.0.0/16"
+    KUBE_SERVICE_ADDRESSES="--service-cluster-ip-range=10.254.0.0/16"
 
 We'll also add parameters for the certificates we generated earlier.
 
